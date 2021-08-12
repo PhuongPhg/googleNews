@@ -4,7 +4,6 @@ import { useState } from 'react';
 import {
   SafeAreaView,
   View,
-  Text,
   StyleSheet,
   FlatList,
   ActivityIndicator
@@ -15,7 +14,6 @@ import { News, NewsResponse } from '../types';
 import concat from 'lodash/concat';
 import uniqBy from 'lodash/uniqBy';
 import { useEffect } from 'react';
-import Reactotron from 'reactotron-react-native'
 import NoNews from '../Components/NoMoreNews';
 
 const NewsScreen = () => {
@@ -59,7 +57,6 @@ const NewsScreen = () => {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" animating={loading} color='#DF7861'/>
-
       </View>
     );
   }

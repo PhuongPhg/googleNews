@@ -8,7 +8,7 @@ function CardItem({item}:{item: News}){
   return(
     <Card containerStyle={styles.cardContainer}>
       <Card.Title>{item.title}</Card.Title>
-      <Card.Image source={{uri: item.image.url}} style={{borderRadius: 12}}/>
+      <Card.Image source={{uri: item.image.url || '../Assets/no_image.jpg'}} style={{borderRadius: 12}}/>
       <View style={styles.row}>
         <Text style={styles.label}>Source</Text>
         <Text style={styles.info}>{item.provider.name}</Text>

@@ -27,9 +27,8 @@ export default function BottomTabNavigation() {
           tabBarInactiveTintColor: 'gray',
         })}
         >
-        <Tab.Screen name="News" component={NewsScreen} 
-        options={optionStyle}/>
-        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="News" component={NewsScreen} options={optionStyle}/>
+        <Tab.Screen name="Search" component={SearchScreen} options={optionStyle}/>
       </Tab.Navigator>
     </NavigationContainer>
   )
