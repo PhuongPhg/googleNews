@@ -1,7 +1,3 @@
-/**
- * @format
- */
-
 import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
@@ -10,71 +6,90 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 import { api_news, defaultOptions } from '../axiosHeader';
 import CardItem from '../Components/Card';
-
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    item: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    item: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    item: 'Third Item',
-  },
-];
+import { News, NewsResponse } from '../types';
+import concat from 'lodash/concat';
+import uniqBy from 'lodash/uniqBy';
+import { useEffect } from 'react';
+import Reactotron from 'reactotron-react-native'
+import NoNews from '../Components/NoMoreNews';
 
 const NewsScreen = () => {
 
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState<News[]>([]);
   const [pageNumber, setPageNumber] = useState(1);
-  const [lastPageReached, setLastPageReached] = useState(false);
-
+  const [totalNews, setTotalNews] = useState(0);
+  const [loading, setLoading] = useState(true)
+  const [loadMore, setLoadMore] = useState(false)
   const getNews = async () => {
+    if(pageNumber >= 5) return
+    setLoadMore(true)
     try {
-      const res = await axios.get(api_news, {
+      const res: NewsResponse = await axios.get(api_news, {
         params: {
           pageNumber: pageNumber,
-          pageSize: 5
+          pageSize: 10
         },
         ...defaultOptions
       }).then(res => res.data)
-      console.log("res", res)
-      setPageNumber(2)
+      setArticles(uniqBy(concat(articles, res.value), 'id'))
+      setTotalNews(res.totalCount)
+      setPageNumber(pageNumber + 1)
     } catch (error) {
       console.log("err", error)
     }
+    setLoading(false)
+    setLoadMore(false)
   }
 
-  const renderItem = ({item}) => {
-  return <CardItem/>
-}
+  const renderItem = ({ item }) => {
+    return <CardItem item={item} />
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    getNews()
+  }, [])
+
+  if(loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" animating={loading} color='#DF7861'/>
+
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View
         style={styles.container}>
-        <Text>Im News Screen</Text>
         <FlatList
-        data={DATA}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        onEndReachedThreshold={1} 
-        onEndReached={getNews}
+          data={articles}
+          renderItem={renderItem}
+          keyExtractor={item => item?.id}
+          onEndReachedThreshold={1}
+          onEndReached={getNews}
+          ListFooterComponent={ pageNumber <= 4 
+            ?
+            <View style={{marginTop: 25, marginBottom: 25}}>
+            <ActivityIndicator size={20} animating={loadMore} color='#DF7861'/>
+            </View>
+            : 
+            <NoNews/> 
+          }
         />
-
       </View>
     </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FCF8E8',
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
